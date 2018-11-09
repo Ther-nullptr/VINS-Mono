@@ -1,0 +1,19 @@
+name: vins-mono
+
+distro: kinetic
+
+packages:
+  - ros-kinetic-cv-bridge
+  - ros-kinetic-tf
+  - ros-kinetic-message-filters
+  - ros-kinetic-image-transport
+
+source:
+  - name: ceres-solver
+    repo: https://github.com/ceres-solver/ceres-solver.git
+    depends:
+      - libgoogle-glog-dev
+      - libatlas-base-dev
+      - libeigen3-dev
+      - libsuitesparse-dev
+    build: cmake
