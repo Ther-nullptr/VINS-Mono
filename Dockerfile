@@ -20,7 +20,7 @@ RUN apt-get update \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
-RUN git clone https://github.com/ceres-solver/ceres-solver.git /ceres-solver\
+RUN git clone https://github.com/ceres-solver/ceres-solver.git /ceres-solver \
  && cd /ceres-solver \
  && mkdir build \
  && cd build \
@@ -31,11 +31,12 @@ RUN git clone https://github.com/ceres-solver/ceres-solver.git /ceres-solver\
 RUN mkdir -p ${HOME}/catkin_ws/src/vins-mono
 COPY . ${HOME}/catkin_ws/src/vins-mono/.
 RUN cd ${HOME}/catkin_ws \
+ && mv src/vins-mono/README.ipynb .. \
  && apt-get update \
- && /bin/bash -c "source /opt/ros/kinetic/setup.bash && rosdep update && rosdep install --as-root apt:false --from-paths src --ignore-src -r -y" \
+ && /bin/bash -c "source /opt/ros/kinetic-nvidia/setup.bash && rosdep update && rosdep install --as-root apt:false --from-paths src --ignore-src -r -y" \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/* \
- && /bin/bash -c "source /opt/ros/kinetic/setup.bash && catkin build"
+ && /bin/bash -c "source /opt/ros/kinetic-nvidia/setup.bash && catkin_make"
 
 RUN echo "source ~/catkin_ws/devel/setup.bash" >> ${HOME}/.bashrc
 

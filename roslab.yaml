@@ -1,6 +1,15 @@
 name: vins-mono
 
-distro: kinetic-nvidia
+distro: kinetic
+
+build: catkin_make
+
+runtime: nvidia
+
+volume:
+  - host_path: /home/ecervera/Desktop/ICRA-2018/EuRoC_MAV_Dataset
+    container_path: /EuRoC_MAV_Dataset
+    options: ro
 
 packages:
   - ros-kinetic-cv-bridge
