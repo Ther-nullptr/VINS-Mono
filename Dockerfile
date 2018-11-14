@@ -1,4 +1,4 @@
-FROM roslab/roslab:kinetic
+FROM roslab/roslab:kinetic-nvidia
 
 USER root
 

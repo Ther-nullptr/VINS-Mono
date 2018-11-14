@@ -1,6 +1,6 @@
 name: vins-mono
 
-distro: kinetic
+distro: kinetic-nvidia
 
 packages:
   - ros-kinetic-cv-bridge
