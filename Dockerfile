@@ -33,10 +33,10 @@ COPY . ${HOME}/catkin_ws/src/vins-mono/.
 RUN cd ${HOME}/catkin_ws \
  && mv src/vins-mono/README.ipynb .. \
  && apt-get update \
- && /bin/bash -c "source /opt/ros/kinetic-nvidia/setup.bash && rosdep update && rosdep install --as-root apt:false --from-paths src --ignore-src -r -y" \
+ && /bin/bash -c "source /opt/ros/kinetic/setup.bash && rosdep update && rosdep install --as-root apt:false --from-paths src --ignore-src -r -y" \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/* \
- && /bin/bash -c "source /opt/ros/kinetic-nvidia/setup.bash && catkin_make"
+ && /bin/bash -c "source /opt/ros/kinetic/setup.bash && catkin_make"
 
 RUN echo "source ~/catkin_ws/devel/setup.bash" >> ${HOME}/.bashrc
 
