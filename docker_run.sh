@@ -20,5 +20,5 @@ docker run --rm \
     --volume="$XAUTH:$XAUTH" \
     --runtime=nvidia \
     -p 8888:8888 \
-    --volume="/home/ecervera/Desktop/ICRA-2018/EuRoC_MAV_Dataset:/EuRoC_MAV_Dataset:ro" \
+    --volume="/media/usuario/DATASET:/DATASET:ro" \
     vins-mono

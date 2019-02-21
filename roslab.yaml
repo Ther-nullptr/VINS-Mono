@@ -1,17 +1,12 @@
 name: vins-mono
 
-distro: kinetic
+base:
+  ubuntu: 16.04
+  ros: kinetic-ros-desktop-full
 
 build: catkin_make
 
-runtime: nvidia
-
-volume:
-  - host_path: /home/ecervera/Desktop/ICRA-2018/EuRoC_MAV_Dataset
-    container_path: /EuRoC_MAV_Dataset
-    options: ro
-
-packages:
+apt:
   - ros-kinetic-cv-bridge
   - ros-kinetic-tf
   - ros-kinetic-message-filters
@@ -26,3 +21,22 @@ source:
       - libeigen3-dev
       - libsuitesparse-dev
     build: cmake
+
+
+
+distro: kinetic
+
+runtime: nvidia
+
+volume:
+  - host_path: /home/ecervera/Desktop/ICRA-2018/EuRoC_MAV_Dataset
+    container_path: /EuRoC_MAV_Dataset
+    options: ro
+
+packages:
+  - ros-kinetic-cv-bridge
+  - ros-kinetic-tf
+  - ros-kinetic-message-filters
+  - ros-kinetic-image-transport
+
+
