@@ -11,14 +11,11 @@ then
     fi
     chmod a+r $XAUTH
 fi
-
 docker run --rm \
     --env="DISPLAY" \
     --env="QT_X11_NO_MITSHM=1" \
     --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
-    -env="XAUTHORITY=$XAUTH" \
+    --env="XAUTHORITY=$XAUTH" \
     --volume="$XAUTH:$XAUTH" \
     --runtime=nvidia \
-    -p 8888:8888 \
-    --volume="/media/usuario/DATASET:/DATASET:ro" \
-    vins-mono
+    --volume="/media/usuario/DATASET:/DATASET:ro"  -p 8888:8888 vins-mono

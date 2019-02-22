@@ -2,7 +2,8 @@ name: vins-mono
 
 base:
   ubuntu: 16.04
-  ros: kinetic-ros-desktop-full
+  ros: kinetic-desktop-full
+  opengl: runtime
 
 build: catkin_make
 
@@ -22,16 +23,16 @@ source:
       - libsuitesparse-dev
     build: cmake
 
+volume:
+  - host_path: /media/usuario/DATASET
+    container_path: /DATASET
+    options: ro
+
 
 
 distro: kinetic
 
 runtime: nvidia
-
-volume:
-  - host_path: /home/ecervera/Desktop/ICRA-2018/EuRoC_MAV_Dataset
-    container_path: /EuRoC_MAV_Dataset
-    options: ro
 
 packages:
   - ros-kinetic-cv-bridge
