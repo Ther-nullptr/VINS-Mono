@@ -6,8 +6,8 @@ ENV DEBIAN_FRONTEND noninteractive
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
 
-RUN apt-get update && apt-get -yq dist-upgrade \
- && apt-get install -yq --no-install-recommends \
+RUN apt-get -o Acquire::ForceIPv4=true update && apt-get -yq dist-upgrade \
+ && apt-get -o Acquire::ForceIPv4=true install -yq --no-install-recommends \
 	locales python-pip cmake \
 	python3-pip python3-setuptools git build-essential \
  && apt-get clean \
@@ -36,7 +36,7 @@ CMD ["jupyter", "lab", "--no-browser", "--ip=0.0.0.0", "--NotebookApp.token=''"]
 ###################################### ROS #####################################
 
 # install packages
-RUN apt-get update && apt-get install -q -y \
+RUN apt-get -o Acquire::ForceIPv4=true update && apt-get -o Acquire::ForceIPv4=true install -q -y \
     dirmngr \
     gnupg2 \
     lsb-release \
@@ -49,7 +49,7 @@ RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 421C365BD9
 RUN echo "deb http://packages.ros.org/ros/ubuntu `lsb_release -sc` main" > /etc/apt/sources.list.d/ros-latest.list
 
 # install bootstrap tools
-RUN apt-get update && apt-get install --no-install-recommends -y \
+RUN apt-get -o Acquire::ForceIPv4=true update && apt-get -o Acquire::ForceIPv4=true install --no-install-recommends -y \
     python-rosdep \
     python-rosinstall \
     python-vcstools \
@@ -62,7 +62,7 @@ RUN rosdep init \
 
 # install ros packages
 ENV ROS_DISTRO kinetic
-RUN apt-get update && apt-get install -y \
+RUN apt-get -o Acquire::ForceIPv4=true update && apt-get -o Acquire::ForceIPv4=true install -y \
     ros-kinetic-desktop-full=1.3.2-0* \
     && rm -rf /var/lib/apt/lists/*
 
@@ -73,8 +73,8 @@ ENTRYPOINT ["/ros_entrypoint.sh"]
 
 ##################################### APT ######################################
 
-RUN apt-get update \
- && apt-get install -yq --no-install-recommends \
+RUN apt-get -o Acquire::ForceIPv4=true update \
+ && apt-get -o Acquire::ForceIPv4=true install -yq --no-install-recommends \
     ros-kinetic-cv-bridge \
     ros-kinetic-tf \
     ros-kinetic-message-filters \
@@ -84,8 +84,8 @@ RUN apt-get update \
 
 ################################### SOURCE #####################################
 
-RUN apt-get update \
- && apt-get install -yq --no-install-recommends \
+RUN apt-get -o Acquire::ForceIPv4=true update \
+ && apt-get -o Acquire::ForceIPv4=true install -yq --no-install-recommends \
     libgoogle-glog-dev \
     libatlas-base-dev \
     libeigen3-dev \
@@ -97,18 +97,22 @@ RUN git clone https://github.com/ceres-solver/ceres-solver.git /ceres-solver \
  && cd /ceres-solver \
  && mkdir build \
  && cd build \
- && cmake ../ \
+ && cmake  ../ \
  && make -j4 install \
  && rm -fr /ceres-solver
 
+##################################### COPY #####################################
+
+RUN mkdir ${HOME}/vins-mono
+
+COPY . ${HOME}/vins-mono
+
 #################################### CATKIN ####################################
 
-RUN mkdir -p ${HOME}/catkin_ws/src/vins-mono
-
-COPY . ${HOME}/catkin_ws/src/vins-mono/.
+RUN mkdir -p ${HOME}/catkin_ws/src && ln -s ${HOME}/vins-mono ${HOME}/catkin_ws/src/.
 
 RUN cd ${HOME}/catkin_ws \
- && apt-get update \
+ && apt-get -o Acquire::ForceIPv4=true update \
  && /bin/bash -c "source /opt/ros/${ROS_DISTRO}/setup.bash && rosdep update && rosdep install --as-root apt:false --from-paths src --ignore-src -r -y" \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/* \
@@ -116,14 +120,10 @@ RUN cd ${HOME}/catkin_ws \
 
 RUN echo "source ~/catkin_ws/devel/setup.bash" >> ${HOME}/.bashrc
 
-##################################### COPY #####################################
-
-COPY . ${HOME}
-
 ##################################### TAIL #####################################
 
 RUN chown -R ${NB_UID} ${HOME}
 
 USER ${NB_USER}
 
-WORKDIR ${HOME}
+WORKDIR ${HOME}/vins-mono

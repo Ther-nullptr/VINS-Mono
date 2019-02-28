@@ -28,16 +28,3 @@ volume:
     container_path: /DATASET
     options: ro
 
-
-
-distro: kinetic
-
-runtime: nvidia
-
-packages:
-  - ros-kinetic-cv-bridge
-  - ros-kinetic-tf
-  - ros-kinetic-message-filters
-  - ros-kinetic-image-transport
-
-
