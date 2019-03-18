@@ -23,8 +23,3 @@ source:
       - libsuitesparse-dev
     build: cmake
 
-volume:
-  - host_path: /media/usuario/DATASET
-    container_path: /DATASET
-    options: ro
-
