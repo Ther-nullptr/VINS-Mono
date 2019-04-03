@@ -1,6 +1,6 @@
 # VINS-Mono
 [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/icra2018/vins-mono.svg)](https://hub.docker.com/r/icra2018/vins-mono)
-<a href="#roslab-run"><img src="https://img.shields.io/badge/ROSLab-HowTo-brightgreen.svg"></a>
+<a href="#how-to-run-with-docker"><img src="https://img.shields.io/badge/Docker-instructions-brightgreen.svg"></a>
 ## A Robust and Versatile Monocular Visual-Inertial State Estimator
 **29 Dec 2017**: New features: Add map merge, pose graph reuse, online temporal calibration function, and support rolling shutter camera. Map reuse videos: 
 
@@ -158,28 +158,22 @@ We are still working on improving the code reliability. For any technical issues
 
 For commercial inquiries, please contact Shaojie SHEN <eeshaojieATust.hk>
 
-# ROSLab Run
+# How to Run with Docker
+## Linux
+#### Prerequisites
+* NVIDIA GPU
+* [nvidia-docker 2.0](https://github.com/nvidia/nvidia-docker/wiki/Installation-(version-2.0))
 
-## Prerequisites:
-* [Docker](https://www.docker.com/)
-* [nvidia-docker](https://github.com/nvidia/nvidia-docker/wiki/Installation-(version-2.0))
-* Tested on Ubuntu Linux 16.04, Docker version 18.06.1-ce, NVIDIA Driver version 410.48.
+Tested on Ubuntu 16.04.6 with Docker 18.06.1-ce, NVIDIA Driver version 410.48.
 
-## 1. Clone the repository and build docker image:
+1. Download a dataset, e.g `EuRoC MH_01_easy`: 
 ```
-git clone https://github.com/ICRA-2018/VINS-Mono.git
-cd VINS-Mono
-./roslab_build
-```
-## 2. Download dataset:
-```
-wget \
-http://robotics.ethz.ch/~asl-datasets/ijrr_euroc_mav_dataset/machine_hall/MH_01_easy/MH_01_easy.bag \
+wget http://robotics.ethz.ch/~asl-datasets/ijrr_euroc_mav_dataset/machine_hall/MH_01_easy/MH_01_easy.bag \
 --output-document=YOUR_PATH_TO_DATASET/MH_01_easy.bag
 ```
-## 3. Launch ROSLab image:
+2. Open a terminal and run the command:
 ```
-./roslab_run --volume=YOUR_PATH_TO_DATASET:/dataset:rw
+nvidia-docker run --rm -p 8888:8888 -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix \
+ -v YOUR_PATH_TO_DATASET:/dataset icra2018/vins-mono:latest
 ```
-## 4. Open JupyterLab in your browser:
-[http://localhost:8888/lab/tree/README.ipynb](http://localhost:8888/lab/tree/README.ipynb)
+3. Run a web browser and open the link: [http://localhost:8888/lab/tree/README.ipynb](http://localhost:8888/lab/tree/README.ipynb)
