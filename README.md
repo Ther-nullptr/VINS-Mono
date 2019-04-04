@@ -166,14 +166,18 @@ For commercial inquiries, please contact Shaojie SHEN <eeshaojieATust.hk>
 
 Tested on Ubuntu 16.04.6 with Docker 18.06.1-ce, NVIDIA Driver version 410.48.
 
-1. Download a dataset, e.g `EuRoC MH_01_easy`: 
+1. Download a dataset, e.g `EuRoC MH_01_easy`:
+
 ```
 wget http://robotics.ethz.ch/~asl-datasets/ijrr_euroc_mav_dataset/machine_hall/MH_01_easy/MH_01_easy.bag \
 --output-document=YOUR_PATH_TO_DATASET/MH_01_easy.bag
 ```
+
 2. Open a terminal and run the command:
+
 ```
 nvidia-docker run --rm -p 8888:8888 -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix \
  -v YOUR_PATH_TO_DATASET:/dataset icra2018/vins-mono:latest
 ```
+
 3. Run a web browser and open the link: [http://localhost:8888/lab/tree/README.ipynb](http://localhost:8888/lab/tree/README.ipynb)
