@@ -165,10 +165,10 @@ void pubOdometry(const Estimator &estimator, const std_msgs::Header &header)
               << tmp_Q.w() << ","
               << tmp_Q.x() << ","
               << tmp_Q.y() << ","
-              << tmp_Q.z() << ","
-              << estimator.Vs[WINDOW_SIZE].x() << ","
-              << estimator.Vs[WINDOW_SIZE].y() << ","
-              << estimator.Vs[WINDOW_SIZE].z() << "," << endl;
+              << tmp_Q.z() << endl;
+            //   << estimator.Vs[WINDOW_SIZE].x() << ","
+            //   << estimator.Vs[WINDOW_SIZE].y() << ","
+            //   << estimator.Vs[WINDOW_SIZE].z() << "," << endl;
         foutC.close();
     }
 }
