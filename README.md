@@ -4,10 +4,13 @@ Repo for the `VINS-Mono` code inside docker `icra2018/vins-mono:latest`. For mor
 
 ## Usage
 
-### Docker
+### Launch
 
 ```bash
-nvidia-docker run -it -u root -p 8888:8888 -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v /home/shuyuan-19/dataset/Euroc:/dataset icra2018/vins-mono:v1 jupyter lab --no-browser --ip=0.0.0.0 --NotebookApp.token='' --allow-root
+# use jupyter
+nvidia-docker run -u jovyan -it -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v /home/shuyuan-19/dataset/Euroc:/dataset icra2018/vins-mono:v1 jupyter lab --no-browser --ip=0.0.0.0 --NotebookApp.token='' --allow-root
+# or launch the terminal (better)
+nvidia-docker run -u jovyan -it -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v /home/shuyuan-19/dataset/Euroc:/dataset icra2018/vins-mono:v1 
 ```
 
 ## Reference
