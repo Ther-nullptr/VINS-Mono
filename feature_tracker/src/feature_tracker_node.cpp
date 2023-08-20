@@ -11,6 +11,10 @@
 
 #define SHOW_UNDISTORTION 0
 
+#ifdef SHOW_TIME
+#include <chrono>
+#endif
+
 vector<uchar> r_status;
 vector<float> r_err;
 queue<sensor_msgs::ImageConstPtr> img_buf;
@@ -83,7 +87,17 @@ void img_callback(const sensor_msgs::ImageConstPtr &img_msg)
     {
         ROS_DEBUG("processing camera %d", i);
         if (i != 1 || !STEREO_TRACK)
+        {
+        #ifdef SHOW_TIME
+            auto start_time = std::chrono::high_resolution_clock::now();
+        #endif
             trackerData[i].readImage(ptr->image.rowRange(ROW * i, ROW * (i + 1)), img_msg->header.stamp.toSec());
+        #ifdef SHOW_TIME
+            auto end_time = std::chrono::high_resolution_clock::now();
+            auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
+            std::cout << "Time taken by [readImage]: " << duration.count() << " microseconds" << std::endl;
+        #endif
+        }
         else
         {
             if (EQUALIZE)
