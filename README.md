@@ -17,6 +17,8 @@ nvidia-docker run -u jovyan -it -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v /
 
 :star:[evo评测VINS-MONO---代码修改、数据格式转换、数据测试](https://blog.csdn.net/xiaojinger_123/article/details/120141017)
 
+:star:[icra/vins-mono docker](https://hub.docker.com/r/icra2018/vins-mono)
+
 [evo评测VINS-MONO---指标解析、算法精度分析（数据集）](https://blog.csdn.net/xiaojinger_123/article/details/120269185)
 
 [VINS-Mono运行与评测](https://rupingcen.blog.csdn.net/article/details/110485772)
