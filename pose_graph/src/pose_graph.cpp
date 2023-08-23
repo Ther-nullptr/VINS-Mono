@@ -519,7 +519,7 @@ void PoseGraph::optimize4DoF()
             }
             m_keyframelist.unlock();
 
-            ceres::Solve(options, &problem, &summary);
+            ceres::Solve(options, &problem, &summary); // TODO ceres定义的东西不要动，把要求解的方程提取出来，放到自定义的求解器中
             //std::cout << summary.BriefReport() << "\n";
             
             //printf("pose optimization time: %f \n", tmp_t.toc());

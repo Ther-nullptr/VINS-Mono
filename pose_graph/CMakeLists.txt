@@ -25,6 +25,8 @@ find_package(Eigen3)
 
 include_directories(${catkin_INCLUDE_DIRS} ${CERES_INCLUDE_DIRS}  ${EIGEN3_INCLUDE_DIR})
 
+include_directories(../utils/include)
+
 catkin_package()
 
 add_executable(pose_graph
@@ -41,6 +43,7 @@ add_executable(pose_graph
     src/ThirdParty/DUtils/Timestamp.cpp
     src/ThirdParty/DVision/BRIEF.cpp
     src/ThirdParty/VocabularyBinary.cpp
+    ../utils/src/MyGoodFeaturesToTrack.cpp
     )
 
 target_link_libraries(pose_graph ${catkin_LIBRARIES}  ${OpenCV_LIBS} ${CERES_LIBRARIES}) 

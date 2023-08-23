@@ -16,7 +16,7 @@
 #include "parameters.h"
 #include "tic_toc.h"
 
-#define SHOW_TIME
+// #define SHOW_TIME
 
 using namespace std;
 using namespace camodocal;

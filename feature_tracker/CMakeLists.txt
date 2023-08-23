@@ -28,10 +28,13 @@ include_directories(
   ${EIGEN3_INCLUDE_DIR}
 )
 
+include_directories(../utils/include)
+
 add_executable(feature_tracker
     src/feature_tracker_node.cpp
     src/parameters.cpp
     src/feature_tracker.cpp
+    ../utils/src/MyGoodFeaturesToTrack.cpp
     )
 
 target_link_libraries(feature_tracker ${catkin_LIBRARIES} ${OpenCV_LIBS})

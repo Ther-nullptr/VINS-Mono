@@ -13,6 +13,24 @@ nvidia-docker run -u jovyan -it -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v /
 nvidia-docker run -u jovyan -it -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v /home/shuyuan-19/dataset/Euroc:/dataset icra2018/vins-mono:v1 
 ```
 
+### Change
+
+#### Time Estimate
+
+若需要打开计时模式，打开`vins-mono/feature_tracker/src/feature_tracker.h`，定义`#define SHOW_TIME`
+
+#### Feature Tracker
+
+查找`cv::goodFeaturesToTrack`函数：
+
+```bash
+$ grep -r -n "cv::goodFeaturesToTrack" .
+./pose_graph/src/keyframe.cpp:96:               cv::goodFeaturesToTrack(image, tmp_pts, 500, 0.01, 10);
+./feature_tracker/src/feature_tracker.cpp:160:            cv::goodFeaturesToTrack(forw_img, n_pts, MAX_CNT - forw_pts.size(), 0.01, MIN_DIST, mask); // TODO
+```
+
+我们要用自定义的函数替换opencv中使用的函数。这一点通过控制`vins-mono/utils/include/MyGoodFeaturesToTrack.h`中的宏`#define CUSTOM_OVERRIDE`来实现。`vins-mono/utils/include/MyGoodFeaturesToTrack.cpp`为自定义函数主体。
+
 ## Reference
 
 :star:[evo评测VINS-MONO---代码修改、数据格式转换、数据测试](https://blog.csdn.net/xiaojinger_123/article/details/120141017)

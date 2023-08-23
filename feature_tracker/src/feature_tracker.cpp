@@ -1,4 +1,5 @@
 #include "feature_tracker.h"
+#include "../../utils/include/MyGoodFeaturesToTrack.h"
 
 int FeatureTracker::n_id = 0;
 
@@ -157,7 +158,11 @@ void FeatureTracker::readImage(const cv::Mat &_img, double _cur_time)
         #ifdef SHOW_TIME
             auto start_time = std::chrono::high_resolution_clock::now();
         #endif
+        #ifdef CUSTOM_OVERRIDE
+            my_goodFeaturesToTrack(forw_img, n_pts, MAX_CNT - forw_pts.size(), 0.01, MIN_DIST, mask);
+        #else
             cv::goodFeaturesToTrack(forw_img, n_pts, MAX_CNT - forw_pts.size(), 0.01, MIN_DIST, mask); // TODO
+        #endif
         #ifdef SHOW_TIME
             auto end_time = std::chrono::high_resolution_clock::now();
             auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
