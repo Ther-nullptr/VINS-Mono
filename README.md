@@ -6,11 +6,22 @@ Repo for the `VINS-Mono` code inside docker `icra2018/vins-mono:latest`. For mor
 
 ### Launch
 
+launch the docker:
+
 ```bash
 # use jupyter
-nvidia-docker run -u jovyan -it -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v /home/shuyuan-19/dataset/Euroc:/dataset icra2018/vins-mono:v1 jupyter lab --no-browser --ip=0.0.0.0 --NotebookApp.token='' --allow-root
+$ nvidia-docker run -u jovyan -it -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v /home/shuyuan-19/dataset/Euroc:/dataset icra2018/vins-mono:v1 jupyter lab --no-browser --ip=0.0.0.0 --NotebookApp.token='' --allow-root
 # or launch the terminal (better)
-nvidia-docker run -u jovyan -it -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v /home/shuyuan-19/dataset/Euroc:/dataset icra2018/vins-mono:v1 
+$ nvidia-docker run -u jovyan -it -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v /home/shuyuan-19/dataset/Euroc:/dataset icra2018/vins-mono:v1 
+```
+
+run the project:
+
+```bash
+$ roscore
+$ roslaunch vins_estimator euroc.launch
+$ roslaunch vins_estimator vins_rviz.launch # optional
+$ rosbag play <bag_file>
 ```
 
 ### Change
@@ -30,6 +41,17 @@ $ grep -r -n "cv::goodFeaturesToTrack" .
 ```
 
 我们要用自定义的函数替换opencv中使用的函数。这一点通过控制`vins-mono/utils/include/MyGoodFeaturesToTrack.h`中的宏`#define CUSTOM_OVERRIDE`来实现。`vins-mono/utils/include/MyGoodFeaturesToTrack.cpp`为自定义函数主体。
+
+#### Equation Solver
+
+求解方程的步骤位于`vins-mono/pose_graph/src/pose_graph.cpp`中。`ceres::Solve(options, &problem, &summary);`为正式求解方程的步骤。
+
+## Evaluation
+
+```bash
+$ evo_ape euroc /dataset/<task_name>/mav0/state_groundtruth_estimate0/data.csv vins_result_loop.txt -va --plot --plot_mode xyz --save_results <task_name>.zip # get the data and visualization
+$ evo_res <task_name_a>.zip <task_name_b>.zip -p --save_table table.csv # comparasion
+```
 
 ## Reference
 

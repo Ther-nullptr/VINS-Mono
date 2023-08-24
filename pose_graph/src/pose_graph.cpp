@@ -467,13 +467,13 @@ void PoseGraph::optimize4DoF()
 
                 sequence_array[i] = (*it)->sequence;
 
-                problem.AddParameterBlock(euler_array[i], 1, angle_local_parameterization);
-                problem.AddParameterBlock(t_array[i], 3);
+                problem.AddParameterBlock(euler_array[i], 1, angle_local_parameterization); //!
+                problem.AddParameterBlock(t_array[i], 3); //!
 
                 if ((*it)->index == first_looped_index || (*it)->sequence == 0)
                 {   
-                    problem.SetParameterBlockConstant(euler_array[i]);
-                    problem.SetParameterBlockConstant(t_array[i]);
+                    problem.SetParameterBlockConstant(euler_array[i]); //!
+                    problem.SetParameterBlockConstant(t_array[i]); //!
                 }
 
                 //add edge
@@ -509,7 +509,7 @@ void PoseGraph::optimize4DoF()
                     problem.AddResidualBlock(cost_function, loss_function, euler_array[connected_index], 
                                                                   t_array[connected_index], 
                                                                   euler_array[i], 
-                                                                  t_array[i]);
+                                                                  t_array[i]); //!
                     
                 }
                 

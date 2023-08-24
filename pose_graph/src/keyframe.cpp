@@ -94,11 +94,12 @@ void KeyFrame::computeBRIEFPoint()
 	else
 	{
 		vector<cv::Point2f> tmp_pts;
-    #ifdef CUSTOM_OVERRIDE
-		my_goodFeaturesToTrack(image, tmp_pts, 500, 0.01, 10);
-    #else
-        cv::goodFeaturesToTrack(image, tmp_pts, 500, 0.01, 10);
-    #endif
+        #ifdef CUSTOM_OVERRIDE
+            my_goodFeaturesToTrack(image, tmp_pts, 500, 0.01, 10);
+        #else
+            cv::goodFeaturesToTrack(image, tmp_pts, 500, 0.01, 10);
+        #endif
+        // cv::goodFeaturesToTrack(image, tmp_pts, 500, 0.01, 10);
 		for(int i = 0; i < (int)tmp_pts.size(); i++)
 		{
 		    cv::KeyPoint key;
