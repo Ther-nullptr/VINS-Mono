@@ -44,6 +44,7 @@ add_executable(pose_graph
     src/ThirdParty/DVision/BRIEF.cpp
     src/ThirdParty/VocabularyBinary.cpp
     ../utils/src/MyGoodFeaturesToTrack.cpp
+    ../utils/src/MatrixExtractor.cpp
     )
 
 target_link_libraries(pose_graph ${catkin_LIBRARIES}  ${OpenCV_LIBS} ${CERES_LIBRARIES}) 

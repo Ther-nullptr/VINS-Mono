@@ -3,7 +3,7 @@
 #common parameters
 imu_topic: "/imu0"
 image_topic: "/cam0/image_raw"
-output_path: "/home/jovyan/output/MH_02"
+output_path: "/home/jovyan/output/MH_01"
 
 #camera calibration 
 model_type: PINHOLE
