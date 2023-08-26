@@ -78,6 +78,40 @@ void evaluateBA(ceres::Problem& problem, const ceres::Solver::Summary& summary){
     gradient_file << "===================\n";
 }
 
+RawEigenMatrix OutputEigenMatrix(ceres::Problem& problem)
+{
+    ceres::Problem::EvaluateOptions EvalOpts;
+    ceres::CRSMatrix jacobian_crs_matrix;
+    std::vector<double> residuals;
+    std::vector<double> gradients;
+    problem.Evaluate(EvalOpts, nullptr, &residuals, &gradients, &jacobian_crs_matrix);
+
+    Eigen::MatrixXd J = CRSMatrix2EigenMatrix(&jacobian_crs_matrix);
+    Eigen::MatrixXd H = J.transpose() * J;
+
+    RawEigenMatrix result{residuals, gradients, J, H};
+
+    return result;
+}
+
+// RawCRSMatrix OutputCRSMatrix(ceres::Problem& problem)
+// {
+//     ceres::Problem::EvaluateOptions EvalOpts;
+//     ceres::CRSMatrix jacobian_crs_matrix;
+//     std::vector<double> residuals;
+//     std::vector<double> gradients;
+//     problem.Evaluate(EvalOpts, nullptr, &residuals, &gradients, &jacobian_crs_matrix);
+
+//     Eigen::MatrixXd J = CRSMatrix2EigenMatrix(&jacobian_crs_matrix);
+//     Eigen::MatrixXd H = J.transpose() * J;
+
+//     ceres::CRSMatrix hessian_crs_matrix = EigenMatrix2CRSMatrix(H);
+
+//     RawCRSMatrix result{residuals, gradients, jacobian_crs_matrix, hessian_crs_matrix};
+
+//     return result;
+// }
+
 Eigen::MatrixXd CRSMatrix2EigenMatrix(ceres::CRSMatrix* jacobian_crs_matrix){
     Eigen::MatrixXd J(jacobian_crs_matrix->num_rows, jacobian_crs_matrix->num_cols);
     J.setZero();
@@ -99,4 +133,35 @@ Eigen::MatrixXd CRSMatrix2EigenMatrix(ceres::CRSMatrix* jacobian_crs_matrix){
         }
     }
     return J;
+}
+
+ceres::CRSMatrix* EigenMatrix2CRSMatrix(Eigen::MatrixXd& jacobian_eigen_matrix) {
+    int num_rows = jacobian_eigen_matrix.rows();
+    int num_cols = jacobian_eigen_matrix.cols();
+
+    // Create vectors to hold CRS matrix data
+    std::vector<int> rows(num_rows + 1, 0);
+    std::vector<int> cols;
+    std::vector<double> values;
+
+    for (int row_index = 0; row_index < num_rows; ++row_index) {
+        for (int col_index = 0; col_index < num_cols; ++col_index) {
+            double value = jacobian_eigen_matrix(row_index, col_index);
+            if (value != 0.0) {
+                cols.push_back(col_index);
+                values.push_back(value);
+            }
+        }
+        rows[row_index + 1] = static_cast<int>(cols.size());
+    }
+
+    // Create a CRSMatrix and assign values
+    ceres::CRSMatrix* jacobian_crs_matrix = new ceres::CRSMatrix;
+    jacobian_crs_matrix->num_rows = num_rows;
+    jacobian_crs_matrix->num_cols = num_cols;
+    jacobian_crs_matrix->rows = rows;
+    jacobian_crs_matrix->cols = cols;
+    jacobian_crs_matrix->values = values;
+
+    return jacobian_crs_matrix;
 }

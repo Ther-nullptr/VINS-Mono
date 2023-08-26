@@ -46,6 +46,12 @@ $ grep -r -n "cv::goodFeaturesToTrack" .
 
 求解方程的步骤位于`vins-mono/pose_graph/src/pose_graph.cpp`中。`ceres::Solve(options, &problem, &summary);`为正式求解方程的步骤。
 
+#### Matrix Extractor
+
+在`vins-mono/pose_graph/src/pose_graph.cpp`中，通过`evaluateBA(problem, summary)`来获取Report，保存residual/gradient/jacobian/hessian.
+
+
+
 ## Evaluation
 
 ```bash

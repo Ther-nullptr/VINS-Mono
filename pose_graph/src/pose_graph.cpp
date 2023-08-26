@@ -521,6 +521,7 @@ void PoseGraph::optimize4DoF()
             m_keyframelist.unlock();
 
             ceres::Solve(options, &problem, &summary); // TODO ceres定义的东西不要动，把要求解的方程提取出来，放到自定义的求解器中
+            // output the matrix to a file
             evaluateBA(problem, summary);
             
             // std::cout << summary.FullReport() << "\n";
