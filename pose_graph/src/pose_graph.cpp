@@ -520,19 +520,16 @@ void PoseGraph::optimize4DoF()
             }
             m_keyframelist.unlock();
 
-            ceres::Solve(options, &problem, &summary); // TODO ceres定义的东西不要动，把要求解的方程提取出来，放到自定义的求解器中
             // output the matrix to a file
-            evaluateBA(problem, summary);
-            
+            // evaluateBA(problem, summary); 
+            ceres::Solve(options, &problem, &summary); // TODO ceres定义的东西不要动，把要求解的方程提取出来，放到自定义的求解器中
+            evaluateBA(problem, summary); 
             // std::cout << summary.FullReport() << "\n";
             
             //printf("pose optimization time: %f \n", tmp_t.toc());
-            /*
-            for (int j = 0 ; j < i; j++)
-            {
-                printf("optimize i: %d p: %f, %f, %f\n", j, t_array[j][0], t_array[j][1], t_array[j][2] );
-            }
-            */
+            
+            printf("optimized num: %d", i);
+            
             m_keyframelist.lock();
             i = 0;
             for (it = keyframelist.begin(); it != keyframelist.end(); it++)

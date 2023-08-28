@@ -12,7 +12,7 @@ launch the docker:
 # use jupyter
 $ nvidia-docker run -u jovyan -it -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v /home/shuyuan-19/dataset/Euroc:/dataset icra2018/vins-mono:v1 jupyter lab --no-browser --ip=0.0.0.0 --NotebookApp.token='' --allow-root
 # or launch the terminal (better)
-$ nvidia-docker run -u jovyan -it -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v /home/shuyuan-19/dataset/Euroc:/dataset icra2018/vins-mono:v1 
+$ nvidia-docker run -u root -it -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v /home/shuyuan-19/dataset/Euroc:/dataset -v /home/shuyuan-19/dataset/Euroc/output:/output icra2018/vins-mono:v1
 ```
 
 run the project:

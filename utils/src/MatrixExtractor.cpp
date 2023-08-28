@@ -1,6 +1,6 @@
 #include "../include/MatrixExtractor.h"
 
-const char* OUTPUT_PATH = "/home/jovyan/output/MH_01";
+const char* OUTPUT_PATH = "/output";
 
 void evaluateBA(ceres::Problem& problem, const ceres::Solver::Summary& summary){
     cout << summary.FullReport() << endl;
