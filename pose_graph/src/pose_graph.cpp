@@ -1,5 +1,6 @@
 #include "pose_graph.h"
 #include "../../utils/include/MatrixExtractor.h"
+#include "../../utils/include/ChipCholeskySolver.h"
 
 PoseGraph::PoseGraph()
 {
@@ -522,8 +523,16 @@ void PoseGraph::optimize4DoF()
 
             // output the matrix to a file
             // evaluateBA(problem, summary); 
-            ceres::Solve(options, &problem, &summary); // TODO ceres定义的东西不要动，把要求解的方程提取出来，放到自定义的求解器中
-            evaluateBA(problem, summary); 
+
+            // version 1: original
+            // evaluateBA(problem, summary); 
+            // ceres::Solve(options, &problem, &summary); // TODO ceres定义的东西不要动，把要求解的方程提取出来，放到自定义的求解器中
+
+            // version 2: use ChipCholeskySolver
+            ChipCholeskySolver<false, true, double, double, double, double> solver(problem, 30);
+            Summary my_summary = solver.solve();
+            std::cout << my_summary.brief_report() << std::endl;
+            // evaluateBA(problem, summary); 
             // std::cout << summary.FullReport() << "\n";
             
             //printf("pose optimization time: %f \n", tmp_t.toc());

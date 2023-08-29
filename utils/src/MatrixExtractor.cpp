@@ -17,6 +17,7 @@ void evaluateBA(ceres::Problem& problem, const ceres::Solver::Summary& summary){
 
     //TicToc t_construct_H;
     Eigen::MatrixXd H = J.transpose()*J;
+    std::cout << H << std::endl;
     //cout << "construct H cost " << t_construct_H.toc() << endl;
 
     static ofstream J_file("/home/jovyan/output/jacobian.txt");
