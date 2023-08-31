@@ -305,9 +305,10 @@ Summary ChipCholeskySolver<chip_arithmetic, print_flag, in_chip_input_type, in_c
         // calculate the new cost(notice that cost is 0.5 * ||residuals||^2)
         problem_.Evaluate(eval_opts, &new_cost, nullptr, &gradients, nullptr);
 
-        double cost_change_ratio = std::abs(new_cost - cost / (cost + function_tolerance));
+        double cost_change_ratio = std::abs((new_cost - cost) / (cost + function_tolerance));
         double max_gradient_norm = std::abs(*std::max_element(gradients.begin(), gradients.end(), [](double a, double b)
                                                         { return std::abs(a) < std::abs(b); }));
+        // std::cout << "max_gradient_norm:" << max_gradient_norm << std::endl;
 
         std::vector<double> parameter_blocks_change;
         for (auto it = parameter_blocks.begin(); it != parameter_blocks.end(); it++)
@@ -317,6 +318,8 @@ Summary ChipCholeskySolver<chip_arithmetic, print_flag, in_chip_input_type, in_c
 
         double parameter_blocks_change_norm = std::sqrt(std::inner_product(parameter_blocks_change.begin(), parameter_blocks_change.end(), parameter_blocks_change.begin(), 0.0));
         double prev_parameter_blocks_norm = std::sqrt(std::inner_product(prev_parameter_blocks.begin(), prev_parameter_blocks.end(), prev_parameter_blocks.begin(), 0.0));
+        // std::cout << "parameter_blocks_change_norm:" << parameter_blocks_change_norm << std::endl;
+        // std::cout << "prev_parameter_blocks_norm:" << prev_parameter_blocks_norm << std::endl;
         double parameter_change_ratio = parameter_blocks_change_norm / (prev_parameter_blocks_norm + parameter_tolerance);
 
         double cost_change = 2 * (cost - new_cost);
@@ -334,7 +337,7 @@ Summary ChipCholeskySolver<chip_arithmetic, print_flag, in_chip_input_type, in_c
         {
             if (max_gradient_norm < gradient_tolerance)
             {
-                Summary summary{.num_iterations = i,
+                Summary summary{.num_iterations = i + 1,
                                 .termination_type = "Gradient tolerance reached",
                                 .max_gradient_norm = max_gradient_norm,
                                 .cost_change_ratio = cost_change_ratio,
@@ -343,27 +346,27 @@ Summary ChipCholeskySolver<chip_arithmetic, print_flag, in_chip_input_type, in_c
             }
             else if (cost_change_ratio < function_tolerance)
             {
-                Summary summary{.num_iterations = i,
+                Summary summary{.num_iterations = i + 1,
                                 .termination_type = "Function tolerance reached",
                                 .max_gradient_norm = max_gradient_norm,
                                 .cost_change_ratio = cost_change_ratio,
                                 .parameter_change_ratio = parameter_change_ratio};
                 return summary;
             }
-            else if (parameter_change_ratio < parameter_tolerance)
-            {
-                Summary summary{.num_iterations = i,
-                                .termination_type = "Parameter tolerance reached",
-                                .max_gradient_norm = max_gradient_norm,
-                                .cost_change_ratio = cost_change_ratio,
-                                .parameter_change_ratio = parameter_change_ratio};
-                return summary;
-            }
+            // else if (parameter_change_ratio < parameter_tolerance)
+            // {
+            //     Summary summary{.num_iterations = i + 1,
+            //                     .termination_type = "Parameter tolerance reached",
+            //                     .max_gradient_norm = max_gradient_norm,
+            //                     .cost_change_ratio = cost_change_ratio,
+            //                     .parameter_change_ratio = parameter_change_ratio};
+            //     return summary;
+            // }
         }
 
         if (i == iteration_ - 1)
         {
-            Summary summary{.num_iterations = i,
+            Summary summary{.num_iterations = i + 1,
                             .termination_type = "Maximum iterations reached",
                             .max_gradient_norm = max_gradient_norm,
                             .cost_change_ratio = cost_change_ratio,

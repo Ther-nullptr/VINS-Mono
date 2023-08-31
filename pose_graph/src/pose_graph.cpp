@@ -533,16 +533,13 @@ void PoseGraph::optimize4DoF()
 #ifdef CUSTOMIZE_CHOLESKY_SOLVER
             // version 1: use ChipCholeskySolver
             // evaluateBA(problem, summary); 
-    ChipCholeskySolver<true, true, double, double, double, double> solver(problem, 30);
+    ChipCholeskySolver<false, false, double, double, double, double> solver(problem, 30);
     Summary my_summary = solver.solve();
     std::cout << my_summary.brief_report() << std::endl;
             // TODO ceres定义的东西不要动，把要求解的方程提取出来，放到自定义的求解器中
 #else
 
     // version 2: original 
-    std::cout << "parameter_tolerance:" << options.parameter_tolerance << std::endl;
-    std::cout << "function_tolerance:" << options.function_tolerance << std::endl;
-    std::cout << "gradient_tolerance:" << options.gradient_tolerance << std::endl;
     ceres::Solve(options, &problem, &summary);
     std::cout << summary.FullReport() << "\n";
     // evaluateBA(problem, summary); 
