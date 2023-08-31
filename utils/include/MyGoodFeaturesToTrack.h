@@ -12,7 +12,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/opencv.hpp>
 
-#define CUSTOM_OVERRIDE
+// #define CUSTOM_OVERRIDE
 
 template<typename T> struct greaterThanPtr
 {

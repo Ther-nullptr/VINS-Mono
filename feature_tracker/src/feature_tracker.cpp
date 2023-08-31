@@ -158,7 +158,7 @@ void FeatureTracker::readImage(const cv::Mat &_img, double _cur_time)
         #ifdef SHOW_TIME
             auto start_time = std::chrono::high_resolution_clock::now();
         #endif
-        #ifdef CUSTOM_OVERRIDE
+        #ifdef CUSTOM_OVERRIDE // for exp 2, change it to 0.1
             my_goodFeaturesToTrack(forw_img, n_pts, MAX_CNT - forw_pts.size(), 0.01, MIN_DIST, mask);
         #else
             cv::goodFeaturesToTrack(forw_img, n_pts, MAX_CNT - forw_pts.size(), 0.01, MIN_DIST, mask); // TODO

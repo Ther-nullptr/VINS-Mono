@@ -2,6 +2,9 @@
 #include "../../utils/include/MatrixExtractor.h"
 #include "../../utils/include/ChipCholeskySolver.h"
 
+#define SHOW_TIME_SOLVER
+#define CUSTOMIZE_CHOLESKY_SOLVER
+
 PoseGraph::PoseGraph()
 {
     posegraph_visualization = new CameraPoseVisualization(1.0, 0.0, 1.0, 1.0);
@@ -436,7 +439,7 @@ void PoseGraph::optimize4DoF()
             options.linear_solver_type = ceres::SPARSE_NORMAL_CHOLESKY;
             //options.minimizer_progress_to_stdout = true;
             //options.max_solver_time_in_seconds = SOLVER_TIME * 3;
-            options.max_num_iterations = 5;
+            options.max_num_iterations = 10;
             ceres::Solver::Summary summary;
             ceres::LossFunction *loss_function;
             loss_function = new ceres::HuberLoss(0.1);
@@ -523,19 +526,35 @@ void PoseGraph::optimize4DoF()
 
             // output the matrix to a file
             // evaluateBA(problem, summary); 
+#ifdef SHOW_TIME_SOLVER
+    auto start_time = std::chrono::high_resolution_clock::now();
+#endif
 
-            // version 1: original
+#ifdef CUSTOMIZE_CHOLESKY_SOLVER
+            // version 1: use ChipCholeskySolver
             // evaluateBA(problem, summary); 
-            // ceres::Solve(options, &problem, &summary); // TODO ceres定义的东西不要动，把要求解的方程提取出来，放到自定义的求解器中
+    ChipCholeskySolver<true, true, double, double, double, double> solver(problem, 30);
+    Summary my_summary = solver.solve();
+    std::cout << my_summary.brief_report() << std::endl;
+            // TODO ceres定义的东西不要动，把要求解的方程提取出来，放到自定义的求解器中
+#else
 
-            // version 2: use ChipCholeskySolver
-            ChipCholeskySolver<false, true, double, double, double, double> solver(problem, 30);
-            Summary my_summary = solver.solve();
-            std::cout << my_summary.brief_report() << std::endl;
-            // evaluateBA(problem, summary); 
-            // std::cout << summary.FullReport() << "\n";
+    // version 2: original 
+    std::cout << "parameter_tolerance:" << options.parameter_tolerance << std::endl;
+    std::cout << "function_tolerance:" << options.function_tolerance << std::endl;
+    std::cout << "gradient_tolerance:" << options.gradient_tolerance << std::endl;
+    ceres::Solve(options, &problem, &summary);
+    std::cout << summary.FullReport() << "\n";
+    // evaluateBA(problem, summary); 
+    
+#endif
             
-            //printf("pose optimization time: %f \n", tmp_t.toc());
+    // printf("pose optimization time: %f \n", tmp_t.toc());
+#ifdef SHOW_TIME_SOLVER
+    auto end_time = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
+    std::cout << "Time taken by [solver]: " << duration.count() << " microseconds" << std::endl;
+#endif
             
             printf("optimized num: %d", i);
             
