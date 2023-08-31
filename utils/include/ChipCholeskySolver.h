@@ -38,7 +38,7 @@ private:
     Eigen::Matrix<matrix_type, -1, -1> CRSMatrix2EigenMatrix(ceres::CRSMatrix *jacobian_crs_matrix); // convert sparse matrix to Eigen matrix
     void scaling_jacobian(Eigen::Matrix<matrix_type, -1, -1> &jacobian); // scaling jacobian
     void positive_definitize(Eigen::Matrix<matrix_type, -1, -1> &A); // positive definitize a half positive definite matrix, for LM algorithm
-    void update_u_v(double rho, std::vector<double>& prev_parameter_blocks, std::vector<double*>& parameter_blocks); // update u and v for LM algorithm
+    bool update_u_v(double rho, std::vector<double>& prev_parameter_blocks, std::vector<double*>& parameter_blocks); // update u and v for LM algorithm
     void cholesky_decomposition(Eigen::Matrix<matrix_type, -1, -1> &A); // cholesky decomposition
     void cholesky_solve(Eigen::Matrix<matrix_type, -1, -1> &L, Eigen::Matrix<residual_type, -1, 1> &b); // cholesky solve
 

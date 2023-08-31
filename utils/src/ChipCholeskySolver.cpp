@@ -8,7 +8,7 @@ std::string Summary::brief_report()
     report += "Termination type: " + termination_type + "\n";
     report += "Max gradient norm: " + std::to_string(max_gradient_norm) + "\n";
     report += "Cost change ratio: " + std::to_string(cost_change_ratio) + "\n";
-    report += "Parameter change ratio: " + std::to_string(parameter_change_ratio);
+    report += "Parameter change ratio: " + std::to_string(parameter_change_ratio) + "\n";
     return report;
 }
 
@@ -126,12 +126,13 @@ void ChipCholeskySolver<chip_arithmetic, print_flag, in_chip_input_type, in_chip
 template <bool chip_arithmetic, bool print_flag,
           typename in_chip_input_type, typename in_chip_output_type,
           typename residual_type, typename matrix_type>
-void ChipCholeskySolver<chip_arithmetic, print_flag, in_chip_input_type, in_chip_output_type, residual_type, matrix_type>::update_u_v(double rho, std::vector<double>& prev_parameter_blocks, std::vector<double*>& parameter_blocks)
+bool ChipCholeskySolver<chip_arithmetic, print_flag, in_chip_input_type, in_chip_output_type, residual_type, matrix_type>::update_u_v(double rho, std::vector<double>& prev_parameter_blocks, std::vector<double*>& parameter_blocks)
 {
     if (rho > 0) // accept the update
     {
         u = u * std::max(1.0 / 3, 1 - std::pow(2 * rho - 1, 3));
         v = 2;
+        return true;
     }
     else // reject the update
     {
@@ -141,6 +142,7 @@ void ChipCholeskySolver<chip_arithmetic, print_flag, in_chip_input_type, in_chip
         {
             *(*it) = prev_parameter_blocks[it - parameter_blocks.begin()];
         }
+        return false;
     }
 }
 
@@ -278,7 +280,7 @@ Summary ChipCholeskySolver<chip_arithmetic, print_flag, in_chip_input_type, in_c
         cholesky_decomposition(H);
 
         // get b
-        Eigen::Matrix<residual_type, -1, 1> b = J.transpose() * Eigen::Map<Eigen::VectorXd>(residuals.data(), residuals.size()); 
+        Eigen::Matrix<residual_type, -1, 1> b = J.transpose() * Eigen::Map<Eigen::Matrix<residual_type, -1, 1>>(residuals.data(), residuals.size()); 
         // deep copy b to prev_b
         Eigen::Matrix<matrix_type, -1, 1> prev_b = b;
 
@@ -301,58 +303,62 @@ Summary ChipCholeskySolver<chip_arithmetic, print_flag, in_chip_input_type, in_c
         }
 
         // calculate the new cost(notice that cost is 0.5 * ||residuals||^2)
-        problem_.Evaluate(eval_opts, &new_cost, nullptr, nullptr, nullptr);
+        problem_.Evaluate(eval_opts, &new_cost, nullptr, &gradients, nullptr);
 
+        double cost_change_ratio = std::abs(new_cost - cost / (cost + function_tolerance));
         double max_gradient_norm = std::abs(*std::max_element(gradients.begin(), gradients.end(), [](double a, double b)
-                                                              { return std::abs(a) < std::abs(b); }));
-        double cost_change_ratio = std::abs(new_cost - cost) / cost;
+                                                        { return std::abs(a) < std::abs(b); }));
 
         std::vector<double> parameter_blocks_change;
         for (auto it = parameter_blocks.begin(); it != parameter_blocks.end(); it++)
         {
             parameter_blocks_change.push_back(*(*it) - prev_parameter_blocks[it - parameter_blocks.begin()]);
         }
+
         double parameter_blocks_change_norm = std::sqrt(std::inner_product(parameter_blocks_change.begin(), parameter_blocks_change.end(), parameter_blocks_change.begin(), 0.0));
         double prev_parameter_blocks_norm = std::sqrt(std::inner_product(prev_parameter_blocks.begin(), prev_parameter_blocks.end(), prev_parameter_blocks.begin(), 0.0));
-        double parameter_change_ratio = parameter_blocks_change_norm / prev_parameter_blocks_norm;
+        double parameter_change_ratio = parameter_blocks_change_norm / (prev_parameter_blocks_norm + parameter_tolerance);
 
         double cost_change = 2 * (cost - new_cost);
-        std::cout << "cost:" << cost << std::endl;
-        std::cout << "new_cost:" << new_cost << std::endl;
-        std::cout << "cost_change:" << cost_change << std::endl;
+        // std::cout << "cost:" << cost << std::endl;
+        // std::cout << "new_cost:" << new_cost << std::endl;
+        // std::cout << "cost_change:" << cost_change << std::endl;
         double model_cost_change = b.dot(2 * prev_b - J.transpose() * J * b);
-        std::cout << "model_cost_change:" << model_cost_change << std::endl;
+        // std::cout << "model_cost_change:" << model_cost_change << std::endl;
 
         // update u and v
         double rho = cost_change / model_cost_change;
-        update_u_v(rho, prev_parameter_blocks, parameter_blocks);
+        bool updated = update_u_v(rho, prev_parameter_blocks, parameter_blocks);
 
-        if (max_gradient_norm < gradient_tolerance)
+        if (updated)
         {
-            Summary summary{.num_iterations = i,
-                            .termination_type = "Gradient tolerance reached",
-                            .max_gradient_norm = max_gradient_norm,
-                            .cost_change_ratio = cost_change_ratio,
-                            .parameter_change_ratio = parameter_change_ratio};
-            return summary;
-        }
-        else if (cost_change_ratio < function_tolerance)
-        {
-            Summary summary{.num_iterations = i,
-                            .termination_type = "Function tolerance reached",
-                            .max_gradient_norm = max_gradient_norm,
-                            .cost_change_ratio = cost_change_ratio,
-                            .parameter_change_ratio = parameter_change_ratio};
-            return summary;
-        }
-        else if (parameter_change_ratio < parameter_tolerance)
-        {
-            Summary summary{.num_iterations = i,
-                            .termination_type = "Parameter tolerance reached",
-                            .max_gradient_norm = max_gradient_norm,
-                            .cost_change_ratio = cost_change_ratio,
-                            .parameter_change_ratio = parameter_change_ratio};
-            return summary;
+            if (max_gradient_norm < gradient_tolerance)
+            {
+                Summary summary{.num_iterations = i,
+                                .termination_type = "Gradient tolerance reached",
+                                .max_gradient_norm = max_gradient_norm,
+                                .cost_change_ratio = cost_change_ratio,
+                                .parameter_change_ratio = parameter_change_ratio};
+                return summary;
+            }
+            else if (cost_change_ratio < function_tolerance)
+            {
+                Summary summary{.num_iterations = i,
+                                .termination_type = "Function tolerance reached",
+                                .max_gradient_norm = max_gradient_norm,
+                                .cost_change_ratio = cost_change_ratio,
+                                .parameter_change_ratio = parameter_change_ratio};
+                return summary;
+            }
+            else if (parameter_change_ratio < parameter_tolerance)
+            {
+                Summary summary{.num_iterations = i,
+                                .termination_type = "Parameter tolerance reached",
+                                .max_gradient_norm = max_gradient_norm,
+                                .cost_change_ratio = cost_change_ratio,
+                                .parameter_change_ratio = parameter_change_ratio};
+                return summary;
+            }
         }
 
         if (i == iteration_ - 1)
@@ -370,3 +376,10 @@ Summary ChipCholeskySolver<chip_arithmetic, print_flag, in_chip_input_type, in_c
 
 template class ChipCholeskySolver<true, true, double, double, double, double>;
 template class ChipCholeskySolver<false, true, double, double, double, double>;
+template class ChipCholeskySolver<true, false, double, double, double, double>;
+template class ChipCholeskySolver<false, false, double, double, double, double>;
+
+//template class ChipCholeskySolver<true, true, float, float, float, float>;
+//template class ChipCholeskySolver<false, true, float, float, float, float>;
+//template class ChipCholeskySolver<true, false, float, float, float, float>;
+//template class ChipCholeskySolver<false, false, float, float, float, float>;
